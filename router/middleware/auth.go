@@ -38,6 +38,9 @@ func StudentAuthMiddleware() gin.HandlerFunc {
 			context.Abort()
 			return
 		}
+		context.Set("number", ctx.Number)
+		context.Set("type", ctx.Type)
+		context.Set("username", ctx.Username)
 		context.Next()
 	}
 }
@@ -56,6 +59,9 @@ func TeacherAuthMiddleware() gin.HandlerFunc {
 			context.Abort()
 			return
 		}
+		context.Set("number", ctx.Number)
+		context.Set("type", ctx.Type)
+		context.Set("username", ctx.Username)
 		context.Next()
 	}
 }

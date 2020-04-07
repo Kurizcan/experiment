@@ -15,7 +15,26 @@ type TeacherInfo struct {
 	College  string `json:"college"`
 }
 
-// Token represents a JSON web token.
-type Token struct {
-	Token string `json:"token"`
+type Output struct {
+	Headers []string `json:"headers"`
+	Rows    []data   `json:"rows"`
 }
+
+type Example struct {
+	Headers TableField  `json:"headers"`
+	Rows    []tableData `json:"rows"`
+}
+
+type TableField struct {
+	Table []string `json:"table"`
+	Field []field  `json:"field"`
+}
+
+// 一行数据
+type data []string
+
+// 字段
+type field []string
+
+// 一张数据库中的数据
+type tableData []data
