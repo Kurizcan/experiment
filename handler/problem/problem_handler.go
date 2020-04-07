@@ -52,7 +52,6 @@ func Create(c *gin.Context) {
 	SendResponse(c, errno.OK, map[string]int{
 		"problemId": p.ProblemId,
 	})
-	return
 }
 
 func UploadData(c *gin.Context) {

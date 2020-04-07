@@ -1,6 +1,7 @@
 package router
 
 import (
+	"experiment/handler/experiment"
 	"experiment/handler/problem"
 	"net/http"
 
@@ -36,6 +37,11 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	{
 		p.POST("", middleware.TeacherAuthMiddleware(), problem.Create)
 		p.PUT("/:id", middleware.TeacherAuthMiddleware(), problem.UploadData)
+	}
+
+	e := g.Group("/api/experiment")
+	{
+		e.POST("", middleware.TeacherAuthMiddleware(), experiment.Create)
 	}
 
 	// The health check handlers

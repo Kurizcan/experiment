@@ -3,7 +3,7 @@ package model
 import "gopkg.in/go-playground/validator.v9"
 
 type ProblemModel struct {
-	ProblemId   int    `json:"problemId" gorm:"column:Problem;primary_key;AUTO_INCREMENT"`
+	ProblemId   int    `json:"problemId" gorm:"column:problem;primary_key;AUTO_INCREMENT"`
 	Title       string `json:"title" gorm:"column:title;not null" validate:"gt=0"`
 	Description string `json:"description" gorm:"column:description;not null" validate:"gt=0"`
 	Example     []byte `json:"example" gorm:"column:example;not null"`
