@@ -51,6 +51,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	{
 		// 老师管理的班级列表
 		c.GET("/:id", middleware.TeacherAuthMiddleware(), class.GetClassByTid)
+		c.GET("/:id/detail", middleware.TeacherAuthMiddleware(), class.GetClassDetail)
 	}
 
 	// The health check handlers

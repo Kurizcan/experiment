@@ -24,3 +24,24 @@ func (c *ClassModel) Search(str []string) (res []ClassModel) {
 	DB.Self.Where("classId in (?)", str).Find(&res)
 	return
 }
+
+func (c *ClassModel) Detail(classId string) error {
+	return DB.Self.Where("classId = ?", classId).Find(&c).Error
+}
+
+type ClassExperimentModel struct {
+	Id        int    `json:"-" gorm:"column:id;primary_key;"`
+	GroupId   int    `json:"group_id" gorm:"column:groupId;"`
+	ClassId   string `json:"class_id" gorm:"column:classId;"`
+	GroupName string `json:"group_name" gorm:"column:groupName;"`
+}
+
+func (ce *ClassExperimentModel) TableName() string {
+	return "class_experiment"
+}
+
+func (ce *ClassExperimentModel) SearchByClassId(classId string) ([]ClassExperimentModel, error) {
+	res := make([]ClassExperimentModel, 0)
+	s := DB.Self.Table(ce.TableName()).Where("classId = ?", classId).Find(&res)
+	return res, s.Error
+}
