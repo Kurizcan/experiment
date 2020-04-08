@@ -1,6 +1,7 @@
 package router
 
 import (
+	"experiment/handler/class"
 	"experiment/handler/experiment"
 	"experiment/handler/problem"
 	"net/http"
@@ -37,11 +38,19 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	{
 		p.POST("", middleware.TeacherAuthMiddleware(), problem.Create)
 		p.PUT("/:id", middleware.TeacherAuthMiddleware(), problem.UploadData)
+		p.GET("/:id", problem.Detail)
 	}
 
 	e := g.Group("/api/experiment")
 	{
 		e.POST("", middleware.TeacherAuthMiddleware(), experiment.Create)
+		e.GET("/:id", middleware.AuthMiddleware(), experiment.ProblemList)
+	}
+
+	c := g.Group("api/class")
+	{
+		// 老师管理的班级列表
+		c.GET("/:id", middleware.TeacherAuthMiddleware(), class.GetClassByTid)
 	}
 
 	// The health check handlers

@@ -81,3 +81,40 @@ func UploadData(c *gin.Context) {
 
 	SendResponse(c, errno.OK, nil)
 }
+
+func Detail(c *gin.Context) {
+	id := c.Param("id")
+	if len(id) == 0 {
+		SendResponse(c, errno.ErrParam, nil)
+		return
+	}
+
+	p := model.ProblemModel{}
+	if err := p.Detail(id); err != nil {
+		SendResponse(c, errno.ErrDatabase, nil)
+		return
+	}
+
+	example := model.Example{}
+	err := json.Unmarshal(p.Example, &example)
+	if err != nil {
+		SendResponse(c, errno.ErrJsonUnmarshal, nil)
+		return
+	}
+	output := model.Output{}
+	err = json.Unmarshal(p.Output, &output)
+	if err != nil {
+		SendResponse(c, errno.ErrJsonUnmarshal, nil)
+		return
+	}
+
+	SendResponse(c, errno.OK, DetailResponse{
+		ProblemId:   p.ProblemId,
+		Title:       p.Title,
+		Description: p.Description,
+		Example:     example,
+		Output:      output,
+		Poster:      p.Poster,
+	})
+
+}

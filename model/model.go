@@ -1,7 +1,7 @@
 package model
 
 type StudentInfo struct {
-	UserId   int    `json:"userId"`
+	UserId   int    `json:"user_id"`
 	Username string `json:"username"`
 	College  string `json:"college"`
 	Grade    int    `json:"password"`
@@ -10,7 +10,7 @@ type StudentInfo struct {
 }
 
 type TeacherInfo struct {
-	UserId   int    `json:"userId"`
+	UserId   int    `json:"user_id"`
 	Username string `json:"username"`
 	College  string `json:"college"`
 }

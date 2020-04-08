@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func genShortId() (string, error) {
+func GenShortId() (string, error) {
 	return shortid.Generate()
 }
 
@@ -27,7 +27,7 @@ func GetReqID(c *gin.Context) string {
 }
 
 func getDataScoreFileName() string {
-	name, _ := genShortId()
+	name, _ := GenShortId()
 	return fmt.Sprintf("%s/%s.sql", viper.GetString("data_scour"), name)
 }
 
