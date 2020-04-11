@@ -27,6 +27,7 @@ type ProblemTag struct {
 	Title     string `json:"title"`
 }
 
+// 教师创建实验
 func Create(c *gin.Context) {
 	var request createRequest
 	if err := c.Bind(&request); err != nil {

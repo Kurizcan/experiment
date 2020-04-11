@@ -60,3 +60,10 @@ type ProblemScore struct {
 	ProblemId int `json:"problem_id" gorm:"column:problemId"`
 	Score     int `json:"score" gorm:"column:score"`
 }
+
+type StudentExperiment struct {
+	GroupId   int    `json:"group_id"`
+	GroupName string `json:"group_name"`
+	Status    int    `json:"status"`
+	Score     int    `json:"score"`
+}

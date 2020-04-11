@@ -21,6 +21,10 @@ func (e *ExperimentModel) Search(str []string, experimentId int) error {
 	return DB.Self.Select(str).Where("groupId = ?", experimentId).Find(&e).Error
 }
 
+func (e *ExperimentModel) GetDetail(experimentId int) error {
+	return DB.Self.Where("groupId = ?", experimentId).Find(&e).Error
+}
+
 func (e *ExperimentModel) Validate() error {
 	validate := validator.New()
 	return validate.Struct(e)

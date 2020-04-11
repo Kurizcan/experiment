@@ -59,7 +59,7 @@ func Login(c *gin.Context) {
 	}
 
 	// 签发 token
-	t, err := token.Sign(c, token.Context{Number: d.Number, Username: d.Username, Type: float64(d.Type)}, "")
+	t, err := token.Sign(c, token.Context{UserId: float64(d.UserId), Number: d.Number, Username: d.Username, Type: float64(d.Type)}, "")
 	if err != nil {
 		SendResponse(c, errno.ErrToken, nil)
 		return

@@ -16,6 +16,7 @@ var (
 
 // Context is the context of the JSON web token.
 type Context struct {
+	UserId   float64
 	Number   string
 	Username string
 	Type     float64
@@ -47,6 +48,7 @@ func Parse(tokenString string, secret string) (*Context, error) {
 
 		// Read the token if it's valid.
 	} else if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		ctx.UserId = claims["userId"].(float64)
 		ctx.Number = claims["number"].(string)
 		ctx.Username = claims["username"].(string)
 		ctx.Type = claims["type"].(float64)
@@ -84,6 +86,7 @@ func Sign(ctx *gin.Context, c Context, secret string) (tokenString string, err e
 	}
 	// The token content include expired.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userId":   c.UserId,
 		"number":   c.Number,
 		"username": c.Username,
 		"type":     c.Type,

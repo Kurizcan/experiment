@@ -4,6 +4,7 @@ import (
 	"experiment/handler/class"
 	"experiment/handler/experiment"
 	"experiment/handler/problem"
+	"experiment/handler/student"
 	"net/http"
 
 	"experiment/handler/sd"
@@ -56,6 +57,10 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		c.GET("/:id/detail", middleware.TeacherAuthMiddleware(), class.GetClassDetail)
 	}
 
+	s := g.Group("api/student")
+	{
+		s.GET("/experiments", middleware.StudentAuthMiddleware(), student.MyExperiments)
+	}
 	// The health check handlers
 	svcd := g.Group("/sd")
 	{
