@@ -38,3 +38,25 @@ type field []string
 
 // 一张数据库中的数据
 type tableData []data
+
+type ExperimentClassDetail struct {
+	Class   int             `json:"class_id"`
+	Grade   int             `json:"grade"`
+	Major   string          `json:"major"`
+	Number  string          `json:"number"`
+	GroupId int             `json:"group_id"`
+	List    []StudentDetail `json:"list"`
+}
+
+type StudentDetail struct {
+	UserId   int            `json:"user_id"`
+	Number   string         `json:"number"`
+	Name     string         `json:"name"`
+	Score    int            `json:"score"`
+	Problems []ProblemScore `json:"problems"`
+}
+
+type ProblemScore struct {
+	ProblemId int `json:"problem_id" gorm:"column:problemId"`
+	Score     int `json:"score" gorm:"column:score"`
+}

@@ -44,13 +44,15 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	e := g.Group("/api/experiment")
 	{
 		e.POST("", middleware.TeacherAuthMiddleware(), experiment.Create)
-		e.GET("/:id", middleware.AuthMiddleware(), experiment.ProblemList)
+		e.GET("/list/:id", middleware.AuthMiddleware(), experiment.ProblemList)
+		e.GET("/class/detail", middleware.AuthMiddleware(), experiment.ClassDetail)
 	}
 
 	c := g.Group("api/class")
 	{
 		// 老师管理的班级列表
 		c.GET("/:id", middleware.TeacherAuthMiddleware(), class.GetClassByTid)
+		// 查看班级详情，包括各项试验数据
 		c.GET("/:id/detail", middleware.TeacherAuthMiddleware(), class.GetClassDetail)
 	}
 

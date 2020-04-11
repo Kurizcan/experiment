@@ -116,3 +116,78 @@ func ProblemList(c *gin.Context) {
 		List:      list,
 	})
 }
+
+func ClassDetail(c *gin.Context) {
+	classId := c.Query("classId")
+	groupIdSrc := c.Query("groupId")
+	if len(classId) == 0 || len(groupIdSrc) == 0 {
+		SendResponse(c, errno.ErrBind, nil)
+		return
+	}
+	groupId, _ := strconv.Atoi(groupIdSrc)
+	// 获取改班级学生列表
+	sc := model.StudentClassModel{}
+	studentList, err := sc.GetStudent(classId)
+	if err != nil || len(studentList) == 0 {
+		SendResponse(c, errno.ErrDatabase, nil)
+		return
+	}
+
+	// 获取班级信息
+	cla := model.ClassModel{}
+	classInfos := cla.Search([]string{classId})
+	if len(classInfos) != 1 {
+		SendResponse(c, errno.ErrDatabase, nil)
+		return
+	}
+
+	res := model.ExperimentClassDetail{
+		Class:   classInfos[0].Class,
+		Grade:   classInfos[0].Grade,
+		Major:   classInfos[0].Major,
+		Number:  classInfos[0].Number,
+		GroupId: groupId,
+		List:    nil,
+	}
+
+	// 获取学生详情信息
+	list := make([]model.StudentDetail, len(studentList))
+
+	wg := sync.WaitGroup{}
+	for i, student := range studentList {
+		wg.Add(1)
+		go func(i, sid int) {
+			defer wg.Done()
+			// 获取学生基本信息
+			s := model.UserModel{}
+			if err := s.Detail(sid); err != nil {
+				SendResponse(c, errno.ErrUserNotFound, nil)
+				log.Infof("can`t find this student id: %d", student)
+				return
+			}
+			// 获取每题得分信息
+			answers := model.AnswerModel{}
+			problemScore, err := answers.GetProblemScore(groupId, sid)
+			if err != nil {
+				SendResponse(c, errno.ErrDatabase, nil)
+				return
+			}
+			// 获取学生总分
+			score := 0
+			for _, v := range problemScore {
+				score += v.Score
+			}
+			list[i] = model.StudentDetail{
+				UserId:   s.UserId,
+				Number:   s.Number,
+				Name:     s.Username,
+				Score:    score,
+				Problems: problemScore,
+			}
+		}(i, student)
+	}
+	wg.Wait()
+
+	res.List = list
+	SendResponse(c, errno.OK, res)
+}

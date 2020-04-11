@@ -32,6 +32,10 @@ func (u *UserModel) Update() error {
 	return DB.Self.Save(u).Error
 }
 
+func (u *UserModel) Detail(id int) error {
+	return DB.Self.Where("userId = ?", id).Find(&u).Error
+}
+
 // 根据学号获取用户信息
 func GetUser(number string) (*UserModel, error) {
 	u := &UserModel{}
