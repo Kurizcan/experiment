@@ -45,3 +45,7 @@ func (ce *ClassExperimentModel) SearchByClassId(classId string) ([]ClassExperime
 	s := DB.Self.Table(ce.TableName()).Where("classId = ?", classId).Find(&res)
 	return res, s.Error
 }
+
+func (ce *ClassExperimentModel) Create() error {
+	return DB.Self.Create(&ce).Error
+}

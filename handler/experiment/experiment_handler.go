@@ -5,6 +5,7 @@ import (
 	. "experiment/handler"
 	"experiment/model"
 	"experiment/pkg/errno"
+	"experiment/service"
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
 	"strconv"
@@ -25,6 +26,11 @@ type ListResponse struct {
 type ProblemTag struct {
 	ProblemId int    `json:"problem_id"`
 	Title     string `json:"title"`
+}
+
+type DistributedRequest struct {
+	GroupId   int      `json:"group_id" binding:"required"`
+	ClassList []string `json:"class_list" binding:"required"`
 }
 
 // 教师创建实验
@@ -191,4 +197,33 @@ func ClassDetail(c *gin.Context) {
 
 	res.List = list
 	SendResponse(c, errno.OK, res)
+}
+
+func Distributed(c *gin.Context) {
+	var request DistributedRequest
+	if err := c.Bind(&request); err != nil {
+		SendResponse(c, errno.ErrBind, nil)
+		return
+	}
+	if len(request.ClassList) == 0 {
+		SendResponse(c, errno.ErrParam, nil)
+		return
+	}
+	// class - experiment 中添加数据
+
+	/* student - experiment 中添加数据
+		 1. 找出对应 classId 的所有学生 id， student - class
+	   2. 更新目标表
+
+		 channel[string](size) 通信机制
+	   1. 插入一个 class - experiment, 往 channel 中写入数据
+	   2. 等待从 channel 中获取 classId，完成 student - experiment 的更新
+	*/
+
+	teacher := service.New()
+	err := teacher.Distributed(request.GroupId, request.ClassList)
+	if err != nil {
+		SendResponse(c, err, nil)
+	}
+	SendResponse(c, errno.OK, nil)
 }

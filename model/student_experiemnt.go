@@ -17,3 +17,7 @@ func (s *StudentExperimentModel) GetGroups(studentId int) ([]StudentExperimentMo
 	db := DB.Self.Where("studentId = ?", studentId).Find(&res)
 	return res, db.Error
 }
+
+func (s *StudentExperimentModel) Create() error {
+	return DB.Self.Create(&s).Error
+}
