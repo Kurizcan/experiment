@@ -59,8 +59,13 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	}
 
 	s := g.Group("api/student")
+	s.Use(middleware.StudentAuthMiddleware())
 	{
-		s.GET("/experiments", middleware.StudentAuthMiddleware(), student.MyExperiments)
+		s.GET("/experiments", student.MyExperiments)
+		s.POST("/submit", student.ProblemSubmit)
+		s.GET("/submit/:id", student.GetStatus)
+		s.GET("/problem/detail", student.GetProblemDetail)
+		s.POST("experiment/submit/:id", student.ExperimentSubmit)
 	}
 	// The health check handlers
 	svcd := g.Group("/sd")

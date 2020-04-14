@@ -1,6 +1,7 @@
 package util
 
 import (
+	"experiment/pkg/constvar"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -50,4 +51,12 @@ func StoreFile(score io.Reader) (string, error) {
 		return "", err
 	}
 	return fileName, nil
+}
+
+func GetUserId(c *gin.Context) int {
+	userId, exists := c.Get("userId")
+	if !exists {
+		return constvar.EMPTY
+	}
+	return int(userId.(float64))
 }

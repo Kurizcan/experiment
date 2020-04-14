@@ -18,6 +18,10 @@ func (s *StudentExperimentModel) GetGroups(studentId int) ([]StudentExperimentMo
 	return res, db.Error
 }
 
+func (s *StudentExperimentModel) Detail(groupId, studentId int) error {
+	return DB.Self.Where("studentId = ? and groupId = ?", studentId, groupId).Find(&s).Error
+}
+
 func (s *StudentExperimentModel) Create() error {
 	return DB.Self.Create(&s).Error
 }

@@ -10,10 +10,11 @@ import (
 
 type Teacher struct{}
 
-func New() *Teacher {
+func NewTeacher() *Teacher {
 	return &Teacher{}
 }
 
+// 分发实验
 func (t *Teacher) Distributed(groupId int, classList []string) error {
 	ch := make(chan string, len(classList))
 	res := make(chan error)

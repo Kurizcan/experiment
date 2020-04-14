@@ -21,3 +21,19 @@ func (a *AnswerModel) GetProblemScore(groupId, studentId int) ([]ProblemScore, e
 	db := DB.Self.Table(a.TableName()).Where("groupId = ? and studentId = ?", groupId, studentId).Scan(&res)
 	return res, db.Error
 }
+
+func (a *AnswerModel) Create() error {
+	return DB.Self.Create(&a).Error
+}
+
+func (a *AnswerModel) Detail(groupId, studentId, problemId int) error {
+	return DB.Self.Where("studentId = ? and groupId = ? and problemId = ?", studentId, groupId, problemId).Find(&a).Error
+}
+
+func (a *AnswerModel) DetailById(id int) error {
+	return DB.Self.Where("id = ?", id).Find(&a).Error
+}
+
+func (a *AnswerModel) Update(data map[string]interface{}, id int) error {
+	return DB.Self.Table(a.TableName()).Where("id = ?", id).Update(data).Error
+}

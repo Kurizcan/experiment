@@ -67,3 +67,14 @@ type StudentExperiment struct {
 	Status    int    `json:"status"`
 	Score     int    `json:"score"`
 }
+
+type ExperimentResult struct {
+	Score int                 `json:"score"`
+	List  []ProblemResultList `json:"list"`
+}
+
+type ProblemResultList struct {
+	ProblemId int    `json:"problem_id"`
+	Score     int    `json:"score"`
+	Title     string `json:"title"`
+}

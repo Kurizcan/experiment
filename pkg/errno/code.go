@@ -14,6 +14,7 @@ var (
 	ErrFileInit      = &Errno{Code: 20005, Message: "read or store file fail or no file upload"}
 	ErrJsonMarshal   = &Errno{Code: 20006, Message: "Json Marshal fail"}
 	ErrJsonUnmarshal = &Errno{Code: 20006, Message: "Json Unmarshal fail"}
+	ErrSubmitRunning = &Errno{Code: 20007, Message: "this problem submit is running"}
 
 	// user errors
 	ErrEncrypt           = &Errno{Code: 20101, Message: "Error occurred while encrypting the user password."}

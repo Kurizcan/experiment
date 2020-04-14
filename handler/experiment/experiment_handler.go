@@ -220,7 +220,7 @@ func Distributed(c *gin.Context) {
 	   2. 等待从 channel 中获取 classId，完成 student - experiment 的更新
 	*/
 
-	teacher := service.New()
+	teacher := service.NewTeacher()
 	err := teacher.Distributed(request.GroupId, request.ClassList)
 	if err != nil {
 		SendResponse(c, err, nil)
