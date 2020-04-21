@@ -15,6 +15,8 @@ var (
 	ErrJsonMarshal   = &Errno{Code: 20006, Message: "Json Marshal fail"}
 	ErrJsonUnmarshal = &Errno{Code: 20006, Message: "Json Unmarshal fail"}
 	ErrSubmitRunning = &Errno{Code: 20007, Message: "this problem submit is running"}
+	ErrSendMsgFail   = &Errno{Code: 20008, Message: "send msg to mq fail"}
+	ErrRedisFail     = &Errno{Code: 20009, Message: "redis operation fail"}
 
 	// user errors
 	ErrEncrypt           = &Errno{Code: 20101, Message: "Error occurred while encrypting the user password."}

@@ -5,6 +5,7 @@ import (
 	. "experiment/handler"
 	"experiment/model"
 	"experiment/pkg/errno"
+	"experiment/pkg/message"
 	"experiment/util"
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -67,15 +68,37 @@ func UploadData(c *gin.Context) {
 		return
 	}
 
-	data, err := util.StoreFile(file)
+	fileName, data, err := util.StoreFile(file)
 	if err != nil {
 		SendResponse(c, errno.ErrFileInit, nil)
 		return
 	}
 
 	p := &model.ProblemModel{}
-	if err := p.Update(problemId, map[string]interface{}{"data": data}); err != nil {
+	if err := p.Update(problemId, map[string]interface{}{"data": fileName}); err != nil {
 		SendResponse(c, errno.ErrDatabase, nil)
+		return
+	}
+
+	// 发送至 MQ
+	msg := message.TopicProblemMessage{
+		ProblemId:  p.ProblemId,
+		DataSource: data,
+		Solution:   p.Solution,
+		OutPut:     p.Output,
+	}
+
+	realMsg, err := util.MsgEncode(msg)
+	if err != nil {
+		SendResponse(c, errno.ErrJsonMarshal, nil)
+		return
+	}
+
+	client := message.GetKafkaClient()
+	err = client.Produce(message.TopicProblem, realMsg)
+	if err != nil {
+		// 发送 mq 失败
+		SendResponse(c, errno.ErrSendMsgFail, nil)
 		return
 	}
 

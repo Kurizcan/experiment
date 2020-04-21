@@ -25,3 +25,11 @@ docker_db:
   password: root
 gormlog: true
 data_scour: data/
+mq:
+  kafka:
+    brokers:
+      - 127.0.0.1:9092
+      - 127.0.0.1:9093
+redis:
+  addr: 127.0.0.1:6739
+  password: experiment

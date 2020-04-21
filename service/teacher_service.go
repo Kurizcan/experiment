@@ -79,7 +79,7 @@ func (t *Teacher) updateExperimentStudent(class chan string, groupId int) {
 				se := model.StudentExperimentModel{
 					GroupId:   groupId,
 					StudentId: sid,
-					Status:    constvar.EXPERIMENT_STUDENT_STATUS[constvar.NEW],
+					Status:    constvar.ExperimentStudentStatus[constvar.NEW],
 				}
 				if err := se.Create(); err != nil {
 					log.Errorf(err, "Distributed experiment to student:%s fail", sid)

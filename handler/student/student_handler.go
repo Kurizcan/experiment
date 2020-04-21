@@ -5,12 +5,15 @@ import (
 	"experiment/model"
 	"experiment/pkg/constvar"
 	"experiment/pkg/errno"
+	"experiment/pkg/message"
+	"experiment/pkg/redis"
 	"experiment/service"
 	"experiment/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type SubmitRequest struct {
@@ -65,30 +68,33 @@ func ProblemSubmit(c *gin.Context) {
 		SendResponse(c, errno.ErrBind, nil)
 		return
 	}
+
 	if len(request.Submit) == 0 {
 		SendResponse(c, errno.ErrParam, nil)
 		return
 	}
 
-	studentId, exists := c.Get("userId")
-	if !exists {
+	studentId := util.GetUserId(c)
+	if studentId == constvar.EMPTY {
 		SendResponse(c, errno.ErrUserNotFound, nil)
 		return
 	}
 
 	var err error
 	answer := model.AnswerModel{}
-	if err = answer.Detail(request.GroupId, int(studentId.(float64)), request.ProblemId); err != nil {
+	if err = answer.Detail(request.GroupId, studentId, request.ProblemId); err != nil {
 		answer.GroupId = request.GroupId
 		answer.ProblemId = request.ProblemId
-		answer.Status = constvar.PROBLEM_SUBMIT_STATUS[constvar.RUNING]
-		answer.StudentId = int(studentId.(float64))
+		answer.Status = constvar.ProblemSubmitStatus[constvar.RUNNING]
+		answer.StudentId = studentId
 		answer.Submit = request.Submit
+		answer.UpdateTime = time.Now().Unix()
 		err = answer.Create()
 	} else {
 		err = answer.Update(map[string]interface{}{
-			"Submit": request.Submit,
-			"Status": constvar.PROBLEM_SUBMIT_STATUS[constvar.RUNING],
+			"Submit":     request.Submit,
+			"Status":     constvar.ProblemSubmitStatus[constvar.RUNNING],
+			"UpdateTime": time.Now().Unix(),
 		}, answer.Id)
 	}
 
@@ -98,11 +104,28 @@ func ProblemSubmit(c *gin.Context) {
 	}
 
 	//TODO 提交至判题队列中进行判题
+	msg := message.TopicAnswerMessage{
+		AnswerId:   answer.Id,
+		ProblemId:  answer.ProblemId,
+		Submit:     answer.Submit,
+		UpdateTime: answer.UpdateTime,
+	}
+	realMsg, err := util.MsgEncode(msg)
+	if err != nil {
+		SendResponse(c, errno.ErrJsonMarshal, nil)
+		return
+	}
+	client := message.GetKafkaClient()
+	err = client.Produce(message.TopicAnswer, realMsg)
+	if err != nil {
+		SendResponse(c, errno.ErrSendMsgFail, nil)
+		return
+	}
 
+	// 可以先返回，目前整个请求是同步，需要等待发送到 mq 成功为止
 	SendResponse(c, errno.OK, map[string]int{
 		"run_id": answer.Id,
 	})
-
 }
 
 func GetStatus(c *gin.Context) {
@@ -118,27 +141,15 @@ func GetStatus(c *gin.Context) {
 		return
 	}
 
-	answer := model.AnswerModel{}
-	if err = answer.DetailById(id); err != nil {
-		SendResponse(c, errno.ErrDatabase, nil)
-		return
-	}
-
 	userId := util.GetUserId(c)
-	if userId == constvar.EMPTY || userId != answer.StudentId {
+	if userId == constvar.EMPTY {
 		SendResponse(c, errno.ErrAuthority, nil)
 		return
 	}
-
-	// TODO 可以将 run_id - userId 关系存储在缓存中，避免权限校验过程需要读取数据库
-
-	SendResponse(c, errno.OK, map[string]interface{}{
-		"status":  answer.Status,
-		"correct": answer.Correct,
-		"error":   answer.Error,
-		"score":   answer.Score,
-	})
-
+	//TODO 可以将 run_id - userId, status 关系存储在缓存中，避免权限校验过程需要读取数据库 Done
+	data, err := getRunIdStatus(id, userId)
+	SendResponse(c, err, data)
+	return
 }
 
 func GetProblemDetail(c *gin.Context) {
@@ -168,7 +179,7 @@ func GetProblemDetail(c *gin.Context) {
 	}
 
 	// 提交的答案运行中，无法查看详情
-	if answer.Status == constvar.PROBLEM_SUBMIT_STATUS[constvar.RUNING] {
+	if answer.Status == constvar.ProblemSubmitStatus[constvar.RUNNING] {
 		SendResponse(c, errno.ErrSubmitRunning, nil)
 		return
 	}
@@ -209,9 +220,32 @@ func ExperimentSubmit(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(res)
-	fmt.Println(res.Score)
-	fmt.Println(res.List)
-
 	SendResponse(c, errno.OK, res)
+}
+
+func getRunIdStatus(runId, userId int) (map[string]interface{}, error) {
+	key := redis.GetRunIdStatusKey(runId, userId)
+	data := make(map[string]interface{})
+	statusSrc := redis.Client.Get(key)
+	status, err := strconv.Atoi(statusSrc)
+	if err == nil && status == constvar.ProblemSubmitStatus[constvar.RUNNING] {
+		data["status"] = status
+		data["correct"] = nil
+		data["error"] = nil
+		data["score"] = nil
+		return data, nil
+	} else {
+		// 缓存失效, 查数据库拿数据
+		answer := model.AnswerModel{}
+		if err := answer.DetailById(runId); err != nil {
+			return nil, errno.ErrDatabase
+		}
+		data["status"] = answer.Status
+		data["correct"] = answer.Correct
+		data["error"] = answer.Error
+		data["score"] = answer.Score
+		// 更新缓存
+		err = redis.Client.Set(key, fmt.Sprintf("%d", answer.Status), time.Hour*12)
+	}
+	return data, nil
 }

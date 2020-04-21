@@ -62,9 +62,11 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	s.Use(middleware.StudentAuthMiddleware())
 	{
 		s.GET("/experiments", student.MyExperiments)
+		// 单道题目的提交
 		s.POST("/submit", student.ProblemSubmit)
 		s.GET("/submit/:id", student.GetStatus)
 		s.GET("/problem/detail", student.GetProblemDetail)
+		// 整个实验提交
 		s.POST("experiment/submit/:id", student.ExperimentSubmit)
 	}
 	// The health check handlers

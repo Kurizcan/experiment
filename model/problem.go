@@ -23,7 +23,7 @@ func (p *ProblemModel) Create() error {
 }
 
 func (p *ProblemModel) Update(problemId string, data interface{}) error {
-	return DB.Self.Model(&p).Where("problemId = ?", problemId).Update(data).Error
+	return DB.Self.Model(&p).Where("problemId = ?", problemId).Update(data).Find(&p).Error
 }
 
 func (p *ProblemModel) Detail(problemId string) error {

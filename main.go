@@ -2,13 +2,14 @@ package main
 
 import (
 	"errors"
+	"experiment/config"
+	"experiment/model"
+	"experiment/pkg/redis"
+	"experiment/router"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 
-	"experiment/config"
-	"experiment/model"
-	"experiment/router"
-	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -29,6 +30,10 @@ func main() {
 	// init db
 	model.DB.Init()
 	defer model.DB.Close()
+
+	// init redis
+	redis.Client.Init()
+	defer redis.Client.Close()
 
 	// Set gin mode.
 	gin.SetMode(viper.GetString("runmode"))
@@ -69,5 +74,5 @@ func pingServer() error {
 		log.Info("Waiting for the router, retry in 1 second.")
 		time.Sleep(time.Second)
 	}
-	return errors.New("Cannot connect to the router.")
+	return errors.New("Cannot connect to the router. ")
 }
