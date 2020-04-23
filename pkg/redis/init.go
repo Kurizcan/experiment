@@ -81,3 +81,11 @@ func (c *ClientRedis) HSetAll(key string, data map[string]interface{}) error {
 	}
 	return nil
 }
+
+func (c *ClientRedis) Expire(key string, duration time.Duration) error {
+	err := Client.Object.Expire(key, duration).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}

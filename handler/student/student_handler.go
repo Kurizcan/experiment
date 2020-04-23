@@ -244,8 +244,8 @@ func getRunIdStatus(runId, userId int) (map[string]interface{}, error) {
 		data["correct"] = answer.Correct
 		data["error"] = answer.Error
 		data["score"] = answer.Score
-		// 更新缓存
-		err = redis.Client.Set(key, fmt.Sprintf("%d", answer.Status), time.Hour*12)
+		// 更新缓存，设置过期时间，避免更新数据库删除缓存操作失败
+		err = redis.Client.Set(key, fmt.Sprintf("%d", answer.Status), time.Minute*5)
 	}
 	return data, nil
 }

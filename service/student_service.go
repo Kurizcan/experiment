@@ -9,6 +9,7 @@ import (
 	"github.com/lexkong/log"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type Student struct{}
@@ -78,6 +79,8 @@ func getExperimentStatus(groupId, studentId int) (model.ExperimentResult, error)
 
 		// 更新 redis
 		err = redis.Client.HSetAll(experimentKey, dataForRedis)
+		// 设置过期时间
+		err = redis.Client.Expire(experimentKey, time.Minute*10)
 
 		return res, errno.OK
 	}

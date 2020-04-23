@@ -18,7 +18,7 @@ type UserModel struct {
 	College  string `json:"college" gorm:"column:college"`
 }
 
-func (c *UserModel) TableName() string {
+func (u *UserModel) TableName() string {
 	return "user"
 }
 
