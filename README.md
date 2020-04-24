@@ -8,4 +8,4 @@ the part of front end is under development
 
 # documents
 
-- [api documenter](https://documenter.getpostman.com/view/4078231/SzYbzJ8F)
+- [api document](https://documenter.getpostman.com/view/4078231/SzYbzJ8F)
