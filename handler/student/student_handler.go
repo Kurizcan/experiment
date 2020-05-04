@@ -49,7 +49,7 @@ func MyExperiments(c *gin.Context) {
 				SendResponse(c, errno.ErrDatabase, nil)
 				return
 			}
-			res[i] = model.StudentExperiment{
+			res[index] = model.StudentExperiment{
 				GroupId:   se.GroupId,
 				GroupName: experiment.GroupName,
 				Status:    se.Status,

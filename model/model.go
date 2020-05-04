@@ -4,7 +4,7 @@ type StudentInfo struct {
 	UserId   int    `json:"user_id"`
 	Username string `json:"username"`
 	College  string `json:"college"`
-	Grade    int    `json:"password"`
+	Grade    int    `json:"grade"`
 	Major    string `json:"major"`
 	Class    int    `json:"class"`
 }
