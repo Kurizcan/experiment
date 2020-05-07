@@ -83,6 +83,11 @@ func ProblemSubmit(c *gin.Context) {
 	var err error
 	answer := model.AnswerModel{}
 	if err = answer.Detail(request.GroupId, studentId, request.ProblemId); err != nil {
+		// 如果正在运行，不准再次提交
+		if answer.Status == constvar.ProblemSubmitStatus[constvar.RUNNING] {
+			SendResponse(c, errno.ErrSubmitRunning, nil)
+			return
+		}
 		answer.GroupId = request.GroupId
 		answer.ProblemId = request.ProblemId
 		answer.Status = constvar.ProblemSubmitStatus[constvar.RUNNING]
