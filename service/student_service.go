@@ -77,6 +77,13 @@ func getExperimentStatus(groupId, studentId int) (model.ExperimentResult, error)
 			List:  list,
 		}
 
+		// 更新 StudentExperimentModel Score 并标记为已完成
+		se := &model.StudentExperimentModel{}
+		_ = se.Update(map[string]interface{}{
+			"status": constvar.ExperimentStudentStatus[constvar.COMPLETED],
+			"score":  score,
+		}, studentId, groupId)
+
 		// 更新 redis
 		err = redis.Client.HSetAll(experimentKey, dataForRedis)
 		// 设置过期时间

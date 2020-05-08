@@ -25,3 +25,7 @@ func (s *StudentExperimentModel) Detail(groupId, studentId int) error {
 func (s *StudentExperimentModel) Create() error {
 	return DB.Self.Create(&s).Error
 }
+
+func (s *StudentExperimentModel) Update(data map[string]interface{}, studentId, groupId int) error {
+	return DB.Self.Table(s.TableName()).Where("studentId = ? and groupId = ?", studentId, groupId).Update(data).Error
+}
