@@ -68,6 +68,7 @@ func Login(c *gin.Context) {
 	SendResponse(c, nil, LoginResponse{
 		UserId:   d.UserId,
 		UserName: d.Username,
+		Type:     d.Type,
 		Token:    t,
 	})
 }

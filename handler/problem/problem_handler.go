@@ -9,6 +9,7 @@ import (
 	"experiment/util"
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
+	"strconv"
 )
 
 func Create(c *gin.Context) {
@@ -140,4 +141,33 @@ func Detail(c *gin.Context) {
 		Poster:      p.Poster,
 	})
 
+}
+
+func List(c *gin.Context) {
+	indexSrc, limitSrc := c.Query("index"), c.Query("limit")
+	index, err := strconv.Atoi(indexSrc)
+	limit, err := strconv.Atoi(limitSrc)
+	if err != nil {
+		SendResponse(c, errno.ErrParam, nil)
+		return
+	}
+	p := &model.ProblemModel{}
+	list, err := p.List(index, limit)
+	if err != nil {
+		SendResponse(c, errno.ErrDatabase, nil)
+		return
+	}
+	SendResponse(c, errno.OK, list)
+}
+
+func GetTotal(c *gin.Context) {
+	p := &model.ProblemModel{}
+	count, err := p.Total()
+	if err != nil {
+		SendResponse(c, errno.ErrDatabase, nil)
+		return
+	}
+	SendResponse(c, errno.OK, map[string]interface{}{
+		"count": count,
+	})
 }

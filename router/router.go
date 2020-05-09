@@ -42,6 +42,12 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		p.GET("/:id", problem.Detail)
 	}
 
+	l := g.Group("/api/problems")
+	{
+		l.GET("/lists", problem.List)
+		l.GET("/total", problem.GetTotal)
+	}
+
 	e := g.Group("/api/experiment")
 	{
 		e.POST("", middleware.TeacherAuthMiddleware(), experiment.Create)

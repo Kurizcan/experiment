@@ -1,13 +1,15 @@
 package model
 
-import "gopkg.in/go-playground/validator.v9"
+import (
+	"gopkg.in/go-playground/validator.v9"
+)
 
 type ProblemModel struct {
 	ProblemId   int    `json:"problem_id" gorm:"column:problemId;primary_key;AUTO_INCREMENT"`
 	Title       string `json:"title" gorm:"column:title;not null" validate:"gt=0"`
 	Description string `json:"description" gorm:"column:description;not null" validate:"gt=0"`
 	Example     []byte `json:"example" gorm:"column:example;not null"`
-	Data        string `json:"data" gorm:"column:data;not null"`
+	Data        string `json:"-" gorm:"column:data;not null"`
 	Solution    string `json:"solution" gorm:"column:solution;not null" validate:"gt=0"`
 	Output      []byte `json:"output" gorm:"column:output;not null"`
 	Poster      string `json:"poster" gorm:"column:poster;not null" validate:"gt=0"`
@@ -32,6 +34,18 @@ func (p *ProblemModel) Detail(problemId string) error {
 
 func (p *ProblemModel) Search(str []string, problemId int) error {
 	return DB.Self.Select(str).Where("problemId = ?", problemId).Find(&p).Error
+}
+
+func (p *ProblemModel) List(index, limit int) ([]ProblemModel, error) {
+	res := make([]ProblemModel, 0)
+	err := DB.Self.Offset(index).Limit(limit).Find(&res).Error
+	return res, err
+}
+
+func (p *ProblemModel) Total() (int, error) {
+	count := 0
+	err := DB.Self.Table(p.TableName()).Count(&count).Error
+	return count, err
 }
 
 // 验证字段
