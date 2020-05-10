@@ -132,7 +132,7 @@ func ClassDetail(c *gin.Context) {
 		return
 	}
 	groupId, _ := strconv.Atoi(groupIdSrc)
-	// 获取改班级学生列表
+	// 获取该班级学生列表
 	sc := model.StudentClassModel{}
 	studentList, err := sc.GetStudent(classId)
 	if err != nil || len(studentList) == 0 {

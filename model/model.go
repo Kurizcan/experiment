@@ -57,9 +57,12 @@ type StudentDetail struct {
 }
 
 type ProblemScore struct {
-	ProblemId int `json:"problem_id" gorm:"column:problemId"`
-	Score     int `json:"score" gorm:"column:score"`
-	Status    int `json:"status" gorm:"column:status"`
+	ProblemId int    `json:"problem_id" gorm:"column:problemId"`
+	Score     int    `json:"score" gorm:"column:score"`
+	Status    int    `json:"status" gorm:"column:status"`
+	Submit    string `json:"submit" gorm:"column:submit"`
+	Error     string `json:"error" gorm:"column:error"`
+	Correct   bool   `json:"correct" gorm:"column:correct"`
 }
 
 type StudentExperiment struct {
