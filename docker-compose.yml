@@ -15,6 +15,7 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: 172.31.134.22
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    command: ["./wait-for-it.sh", "zookeeper:2181", "--", "start-kafka.sh"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   kafka2:
@@ -27,6 +28,7 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: 172.31.134.22
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    command: ["./wait-for-it.sh", "zookeeper:2181", "--", "start-kafka.sh"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   mysql:
@@ -48,15 +50,16 @@ services:
       - "6379:6379"
   experiment-api-server:
     container_name: experiment-api-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
     depends_on:
       - mysql
       - redis
       - zookeeper
       - kafka1
       - kafka2
-    ports:
-      - "8081:8081"
-    build:
-      context: .
-      dockerfile: Dockerfile
+    command: ["./wait-for-it.sh", "mysql:3306", "redis:6379", "kafka1:9092", "kafka2:9092", "--", "./experiment"]
     restart: on-failure
