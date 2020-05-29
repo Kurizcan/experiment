@@ -24,7 +24,7 @@ docker_db:
   username: root
   password: root
 gormlog: true
-data_scour: data/
+data_scour: data
 mq:
   kafka:
     brokers:

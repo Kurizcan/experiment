@@ -24,7 +24,7 @@ func getDataScoreFileName() string {
 
 func StoreFile(score io.Reader) (string, []byte, error) {
 	fileName := getDataScoreFileName()
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		log.Fatal("open file fail", err)
 		return "", nil, err
